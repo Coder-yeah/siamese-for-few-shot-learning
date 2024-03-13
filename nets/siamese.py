@@ -81,7 +81,7 @@ class Siamese(nn.Module):
         #   我们将两个输入传入到主干特征提取网络
         # ------------------------------------------#
         # vgg16: 3*3*512
-        x1 = self.vgg.features(x1)
+        x1 = self.vgg.features(x1)              # 尺寸为什么会是2*512*3*3的？--->dataset代码
         x2 = self.vgg.features(x2)
 
         # resnet:
@@ -97,8 +97,9 @@ class Siamese(nn.Module):
         # x = torch.abs(x1 - x2)
 
         # 计算dim=1的余弦相似度，进行连接
-        x = torch.cosine_similarity(x1, x2, dim=1)          # 返回尺寸
-        print(x.shape)
+        x = torch.cosine_similarity(x1, x2, dim=2)          # 返回尺寸
+        x = torch.flatten(x, 1)
+
         # -------------------------#
         #   进行两次全连接，变尺寸进行余弦相似度计算？
         # -------------------------#
