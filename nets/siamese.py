@@ -71,8 +71,8 @@ class Siamese(nn.Module):
         # self.vgg.features[6] = SENet(128)
 
         # vgg+余弦距离
-        self.fully_connect1 = torch.nn.Linear(512, 128)
-        self.fully_connect2 = torch.nn.Linear(128, 1)
+        self.fully_connect1 = torch.nn.Linear(512, 256)
+        self.fully_connect2 = torch.nn.Linear(256, 1)
 
     def forward(self, x):
         x1, x2 = x
@@ -95,7 +95,7 @@ class Siamese(nn.Module):
         # x = torch.abs(x1 - x2)
 
         # 计算dim=1的余弦相似度，进行连接
-        x1 = x1.view(8, 512, 9)                         # why is 8 ???
+        x1 = x1.view(8, 512, 9)                         # why is 8 = 2*4（batchsize的两倍）？？
         x2 = x2.view(8, 512, 9)
         x = torch.cosine_similarity(x1, x2, dim=2)          # 返回每一个特征图的相似度度量，512维的向量，不用展平了
 
