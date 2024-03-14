@@ -42,18 +42,26 @@ class SENet(nn.Module):
 
 
 class Siamese(nn.Module):
-    def __init__(self, input_shape, pretrained=False):
-    # def __init__(self, pretrained=False):
+    def __init__(self, input_shape, pretrained=False):          # vgg
+    # def __init__(self, pretrained=False):     # resnet
         super(Siamese, self).__init__()
         # resnet:
         # self.resnet = Resnet50(pretrained=pretrained)
         # self.resnet.avgpool = Identity()
         # self.resnet.fc = Identity()
+        # resnet:
+        # flat_shape = 32768
 
         # vgg16:
         self.vgg = VGG16(pretrained, 3)  # 主干网络vgg16，已经加载好预训练权重
         del self.vgg.avgpool
         del self.vgg.classifier
+        # 最后使用的卷积核数量是512
+        # vgg16卷积结束的尺寸:
+        # flat_shape = 512 * get_img_output_length(input_shape[1], input_shape[0])
+        # vgg16
+        # self.fully_connect1 = torch.nn.Linear(flat_shape, 512)
+        # self.fully_connect2 = torch.nn.Linear(512, 1)
 
         # 增加通道注意力机制:主要是变换通道数
         # self.vgg = VGG16(pretrained, 3)
@@ -62,18 +70,9 @@ class Siamese(nn.Module):
         # self.vgg.features[1] = SENet(64)         # 插入注意力模块到卷积层
         # self.vgg.features[6] = SENet(128)
 
-        # 最后使用的卷积核数量是512
-        # vgg16:
-        # flat_shape = 512 * get_img_output_length(input_shape[1], input_shape[0])
-
-        # resnet:
-        # flat_shape = 32768
-
-        # 余弦距离
-        flat_shape = 512 * 3
-
-        self.fully_connect1 = torch.nn.Linear(flat_shape, 512)
-        self.fully_connect2 = torch.nn.Linear(512, 1)
+        # vgg+余弦距离
+        self.fully_connect1 = torch.nn.Linear(512, 128)
+        self.fully_connect2 = torch.nn.Linear(128, 1)
 
     def forward(self, x):
         x1, x2 = x
@@ -93,12 +92,12 @@ class Siamese(nn.Module):
         # -------------------------#
         # x1 = torch.flatten(x1, 1)
         # x2 = torch.flatten(x2, 1)
-        #
         # x = torch.abs(x1 - x2)
 
         # 计算dim=1的余弦相似度，进行连接
-        x = torch.cosine_similarity(x1, x2, dim=2)          # 返回尺寸
-        x = torch.flatten(x, 1)
+        x1 = x1.view(8, 512, 9)                         # why is 8 ???
+        x2 = x2.view(8, 512, 9)
+        x = torch.cosine_similarity(x1, x2, dim=2)          # 返回每一个特征图的相似度度量，512维的向量，不用展平了
 
         # -------------------------#
         #   进行两次全连接，变尺寸进行余弦相似度计算？
