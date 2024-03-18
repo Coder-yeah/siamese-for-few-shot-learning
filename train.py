@@ -178,8 +178,7 @@ if __name__ == "__main__":
     #     else:
     #         download_weights("vgg16")
 
-    model = Siamese(input_shape, pretrained)  # vgg定义网络实例
-    # model = Siamese(pretrained)       # resnet定义网络
+    model = Siamese()
     print(model)
 
     if model_path != '':
