@@ -73,7 +73,7 @@ if __name__ == "__main__":
     #
     #   如果训练过程中存在中断训练的操作，可以将model_path设置成logs文件夹下的权值文件，将已经训练了一部分的权值再次载入。
     #   同时修改下方的 冻结阶段 或者 解冻阶段 的参数，来保证模型epoch的连续性。
-    #   
+    #
     #   当model_path = ''的时候不加载整个模型的权值。
     #
     #   此处使用的是整个模型的权重，因此是在train.py进行加载的，pretrain不影响此处的权值加载。
@@ -109,7 +109,7 @@ if __name__ == "__main__":
     #   batch_size      每次输入的图片数量
     # ------------------------------------------------------#
     Init_Epoch = 0
-    Epoch = 10
+    Epoch = 300
     batch_size = 32
 
     # ------------------------------------------------------------------#
@@ -178,7 +178,8 @@ if __name__ == "__main__":
     #     else:
     #         download_weights("vgg16")
 
-    model = Siamese()
+    model = Siamese(input_shape, pretrained)  # vgg定义网络实例
+    # model = Siamese(pretrained)       # resnet定义网络
     print(model)
 
     if model_path != '':

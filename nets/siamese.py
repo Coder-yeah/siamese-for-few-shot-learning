@@ -3,7 +3,6 @@ import torch.nn as nn
 from torch.nn import Identity
 
 from nets.vgg import VGG16
-from resnet import Resnet50
 
 
 # 每次通过一个尺寸为2，stride为2的池化层才会导致图片的输入尺寸发生变化
